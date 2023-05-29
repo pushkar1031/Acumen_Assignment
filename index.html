@@ -1,1 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Picture Gallery Application</title>
+    <style>
+      /* CSS for the picture gallery */
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+      }
+
+      .gallery img {
+        width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Picture Gallery</h1>
+    <div>
+      <input
+        type="text"
+        id="categoryInput"
+        placeholder="Enter a category name"
+      />
+      <select id="sizeSelect">
+        <option value="full">Full (Maximum Dimensions)</option>
+        <option value="regular">Regular (1080px width)</option>
+        <option value="small">Small (400px width)</option>
+        <option value="thumb">Thumbnail (200px width)</option>
+      </select>
+      <button id="searchButton">Search</button>
+    </div>
+    <div class="gallery" id="pictureGallery"></div>
+
+    <script>
+      const categoryInput = document.getElementById("categoryInput");
+      const sizeSelect = document.getElementById("sizeSelect");
+      const searchButton = document.getElementById("searchButton");
+      const pictureGallery = document.getElementById("pictureGallery");
+
+      searchButton.addEventListener("click", searchPictures);
+
+      function searchPictures() {
+        const category = categoryInput.value;
+        const size = sizeSelect.value;
+        const url = `https://api.unsplash.com/search/photos?query=${category}&per_page=9&client_id=5MwI6UY168NVeoNCf1zkFmEjhRyfBDtPT470twhlznQ`;
+
+        // Make a GET request to the Unsplash API
+        fetch(url)
+          .then((response) => response.json())
+          .then((data) => {
+            displayPictures(data.results, size);
+          })
+          .catch((error) => {
+            console.log("Error:", error);
+          });
+      }
+
+      function displayPictures(pictures, size) {
+        pictureGallery.innerHTML = "";
+
+        pictures.forEach((picture) => {
+          const img = document.createElement("img");
+
+          if (size === "full") {
+            img.src = picture.urls.full;
+          } else if (size === "regular") {
+            img.src = picture.urls.regular;
+          } else if (size === "small") {
+            img.src = picture.urls.small;
+          } else if (size === "thumb") {
+            img.src = picture.urls.thumb;
+          }
+
+          img.alt = picture.alt_description;
+
+          const author = document.createElement("p");
+          author.textContent = `Author: ${picture.user.name}`;
+
+          const link = document.createElement("a");
+          link.href = picture.links.html;
+          link.textContent = "View on Unsplash";
+
+          const container = document.createElement("div");
+          container.appendChild(img);
+          container.appendChild(author);
+          container.appendChild(link);
+
+          pictureGallery.appendChild(container);
+        });
+      }
+    </script>
+  </body>
+</html>
 
